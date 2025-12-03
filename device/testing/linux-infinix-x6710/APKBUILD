@@ -1,0 +1,72 @@
+pkgname=linux-infinix-x6710
+pkgver=6.18.0
+pkgrel=0
+pkgdesc="Infinix Note 30 VIP mainline"
+arch="aarch64"
+_carch="arm64"
+_flavor="infinix-x6710"
+url="https://kernel.org"
+license="GPL-2.0-only"
+options="!strip !check !tracedeps pmb:cross-native pmb:kconfigcheck-community"
+makedepends="
+	android-tools
+	mkbootimg
+	gzip
+	bash
+	bc
+	bison
+	devicepkg-dev
+	flex
+	lz4
+	openssl-dev
+	perl
+	python3
+"
+
+_repository="linux"
+_commit="7d0a66e4bb9081d75c82ec4957c50034cb0ea449"
+_config="config-$_flavor.$arch"
+source="
+	$pkgname-$_commit.tar.gz::https://github.com/MT6893-Mainline/$_repository/archive/$_commit.tar.gz
+	$_config
+"
+builddir="$srcdir/$_repository-$_commit"
+_outdir=".output"
+
+prepare() {
+	default_prepare
+	cp "$srcdir/config-$_flavor.$arch" .config
+}
+
+build() {
+	unset LDFLAGS
+
+	# first, build the image, dtbs and modules - regular build flow
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1))-$_flavor"
+
+	# lk needs gzip compression to boot - so build a gzip-compressed image
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1))-$_flavor" Image.gz
+
+}
+
+package() {
+	mkdir -p "$pkgdir"/boot
+
+	install -Dm644 "$builddir/arch/$_carch/boot/Image.gz" \
+		"$pkgdir/boot/vmlinuz"
+
+	make modules_install dtbs_install \
+		ARCH="$_carch" \
+		INSTALL_PATH="$pkgdir"/boot/ \
+		INSTALL_MOD_PATH="$pkgdir" \
+		INSTALL_MOD_STRIP=1 \
+		INSTALL_DTBS_PATH="$pkgdir"/boot/dtbs
+	rm -f "$pkgdir"/lib/modules/*/build "$pkgdir"/lib/modules/*/source
+
+	install -D "$builddir"/include/config/kernel.release \
+		"$pkgdir"/usr/share/kernel/$_flavor/kernel.release
+}
+
+sha512sums=""
