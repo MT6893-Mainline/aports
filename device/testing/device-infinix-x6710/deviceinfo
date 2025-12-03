@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-2.0
+#
+# Copyright (c) Ryo "evilMyQueen" Yamada <evilMyQueen@mainlining.org>
+
+deviceinfo_format_version="0"
+deviceinfo_name="Infinix Note 30 VIP"
+deviceinfo_manufacturer="Infinix"
+deviceinfo_codename="infinix-x6710"
+deviceinfo_year="2024"
+deviceinfo_dtb="mediatek/mt6893-infinix-x6710"
+deviceinfo_arch="aarch64"
+
+# Device related
+deviceinfo_chassis="handset"
+deviceinfo_external_storage="true"
+deviceinfo_screen_width="1080"
+deviceinfo_screen_height="2400"
+
+# Bootloader related
+deviceinfo_flash_method="fastboot"
+deviceinfo_kernel_cmdline="bootopt=64S3,32N2,64N2 buildvariant=user console=tty0 clk_ignore_unused PMOS_NO_OUTPUT_REDIRECT PMOS_NOSPLASH"
+deviceinfo_generate_bootimg="true"
+deviceinfo_bootimg_qcdt="false"
+deviceinfo_header_version="4"
+deviceinfo_append_dtb="false"
